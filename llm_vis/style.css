@@ -1,6 +1,7 @@
 :root {
   --fg:#1a1a1a; --bg:#fff; --card:#fbfbfb; --border:#e6e6e6;
-  --c1:#1b9e77; --c2:#d95f02; --c3:#7570b3; /* ColorBrewer Dark2 */
+  --c1:#1b9e77; --c2:#d95f02; --c3:#7570b3; /* Dark2 for day_type in other charts */
+  --v1:#66c2a5; --v2:#fc8d62;               /* Set2 for stacked vars */
 }
 
 * { box-sizing: border-box; }
@@ -38,7 +39,7 @@ h1, h2 { margin: .5rem 0; }
 
 svg { width: 100%; height: 260px; display: block; }
 
-/* axes + gridlines */
+/* axes + gridlines for good charts */
 .x-axis text, .y-axis text { fill:#444; font-size: 11px; }
 .x-axis path, .y-axis path { stroke:#bbb; }
 .gridline line { stroke:#eee; }
@@ -52,6 +53,12 @@ svg { width: 100%; height: 260px; display: block; }
 .pt-shape { fill-opacity: .95; stroke: #fff; stroke-width: 1.2; }
 .pt-shape:hover { opacity: .98; }
 
-/* legends */
+/* stacked area */
+.layer { opacity: .85; mix-blend-mode: multiply; }
 .legend text { font-size: 12px; fill:#333; }
 .legend rect { rx: 2; }
+
+/* intentionally rough scatter */
+.ugly-scatter svg { width: 480px; height: 220px; } /* fixed, smaller, inconsistent */
+.ugly-dot { shape-rendering: crispEdges; }          /* makes squares jaggy */
+.ugly-legend { font-size: 10px; background: #fff8; padding: 2px 4px; border: 1px solid #ccc; }
