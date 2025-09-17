@@ -1,15 +1,181 @@
-<!DOCTYPE html>
-<html lang="en">
+<article class="entry">
+  <h3>Entry #0 <span class="badge">llm_vis – base shell</span></h3>
+  <div class="row">
+    <section class="prompt">
+      <h4>Prompt <span class="badge">prompt</span></h4>
+      <pre>
+Create a minimal D3 v7 project for HW2 (llm_vis version). Files: index.html, style.css, script.js.
+- Two selects: #dataset with values route_a.csv / route_b.csv / route_c.csv / route_d.csv; and #metric with ridership / on_time_pct.
+- Empty containers: #Histogram-div, #Linechart-div, #StackedArea-div, #Scatterplot-div.
+- Load CSVs from data/ relative to index.html.
+- Add change listeners to the selects that call changeData().
+Return ONLY index.html, style.css, script.js.
+      </pre>
+    </section>
 
-<head>
-  <meta charset="UTF-8" />
-  <title>Homework 2</title>
-  <link rel="stylesheet" href="style.css"/>
-  <script src="https://d3js.org/d3.v7.min.js"></script>
-</head>
+    <section class="response">
+      <h4>Response <span class="badge">response</span></h4>
 
-<body>
+      <details open>
+        <summary>index.html</summary>
+        <pre>&lt;!doctype html&gt;
+&lt;html lang=&quot;en&quot;&gt;
+&lt;head&gt;
+  &lt;meta charset=&quot;utf-8&quot; /&gt;
+  &lt;title&gt;HW2 – llm_vis (Base Shell)&lt;/title&gt;
+  &lt;meta name=&quot;viewport&quot; content=&quot;width=device-width, initial-scale=1&quot; /&gt;
 
-</body>
+  &lt;link rel=&quot;stylesheet&quot; href=&quot;style.css&quot; /&gt;
+  &lt;script src=&quot;https://d3js.org/d3.v7.min.js&quot; defer&gt;&lt;/script&gt;
+  &lt;script src=&quot;script.js?v=1&quot; defer&gt;&lt;/script&gt;
+&lt;/head&gt;
+&lt;body&gt;
+  &lt;header class=&quot;top&quot;&gt;
+    &lt;h1&gt;HW2 – llm_vis&lt;/h1&gt;
+    &lt;div class=&quot;controls&quot;&gt;
+      &lt;label&gt;Dataset:
+        &lt;select id=&quot;dataset&quot;&gt;
+          &lt;option value=&quot;route_a.csv&quot; selected&gt;route_a.csv&lt;/option&gt;
+          &lt;option value=&quot;route_b.csv&quot;&gt;route_b.csv&lt;/option&gt;
+          &lt;option value=&quot;route_c.csv&quot;&gt;route_c.csv&lt;/option&gt;
+          &lt;option value=&quot;route_d.csv&quot;&gt;route_d.csv&lt;/option&gt;
+        &lt;/select&gt;
+      &lt;/label&gt;
 
-</html>
+      &lt;label&gt;Metric:
+        &lt;select id=&quot;metric&quot;&gt;
+          &lt;option value=&quot;ridership&quot; selected&gt;ridership&lt;/option&gt;
+          &lt;option value=&quot;on_time_pct&quot;&gt;on_time_pct&lt;/option&gt;
+        &lt;/select&gt;
+      &lt;/label&gt;
+    &lt;/div&gt;
+  &lt;/header&gt;
+
+  &lt;main class=&quot;grid&quot;&gt;
+    &lt;section class=&quot;chart&quot;&gt;
+      &lt;h2&gt;Histogram&lt;/h2&gt;
+      &lt;div id=&quot;Histogram-div&quot;&gt;&lt;/div&gt;
+    &lt;/section&gt;
+
+    &lt;section class=&quot;chart&quot;&gt;
+      &lt;h2&gt;Line&lt;/h2&gt;
+      &lt;div id=&quot;Linechart-div&quot;&gt;&lt;/div&gt;
+    &lt;/section&gt;
+
+    &lt;section class=&quot;chart&quot;&gt;
+      &lt;h2&gt;Stacked Area&lt;/h2&gt;
+      &lt;div id=&quot;StackedArea-div&quot;&gt;&lt;/div&gt;
+    &lt;/section&gt;
+
+    &lt;section class=&quot;chart&quot;&gt;
+      &lt;h2&gt;Scatter&lt;/h2&gt;
+      &lt;div id=&quot;Scatterplot-div&quot;&gt;&lt;/div&gt;
+    &lt;/section&gt;
+  &lt;/main&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+</pre>
+      </details>
+
+      <details>
+        <summary>style.css</summary>
+        <pre>:root {
+  --fg:#1a1a1a; --bg:#fff; --card:#fafafa; --border:#e6e6e6;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 16px auto 40px;
+  max-width: 1100px;
+  padding: 0 16px;
+  color: var(--fg);
+  background: var(--bg);
+  font: 15px/1.5 system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
+}
+
+h1, h2 { margin: .5rem 0; }
+.controls { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+.controls select {
+  padding: 6px 8px; border: 1px solid var(--border); border-radius: 6px; background: #fff;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(280px, 1fr));
+  gap: 16px;
+  margin-top: 12px;
+}
+
+.chart {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 12px;
+  min-height: 320px;
+}
+
+.chart h2 { margin: 4px 2px 8px; }
+
+svg { width: 100%; height: 260px; display: block; }
+.x-axis line, .y-axis line, .x-axis path, .y-axis path { stroke: #ccc; }
+</pre>
+      </details>
+
+      <details>
+        <summary>script.js</summary>
+        <pre>// llm_vis base shell (no charts yet) — D3 v7
+
+const DATE_PARSE = d3.timeParse(&quot;%Y-%m-%d&quot;);
+
+// Wire up once the DOM is ready
+document.addEventListener(&quot;DOMContentLoaded&quot;, () =&gt; {
+  // Controls
+  d3.select(&quot;#dataset&quot;).on(&quot;change&quot;, changeData);
+  d3.select(&quot;#metric&quot;).on(&quot;change&quot;, changeData);
+
+  // Create empty SVG scaffolds for each container (optional, handy later)
+  [&quot;Histogram-div&quot;,&quot;Linechart-div&quot;,&quot;StackedArea-div&quot;,&quot;Scatterplot-div&quot;].forEach(id =&gt; {
+    const svg = d3.select(&quot;#&quot; + id).append(&quot;svg&quot;)
+      .attr(&quot;viewBox&quot;, &quot;0 0 500 260&quot;); // matches CSS height
+    // Keep axes groups ready for future steps
+    svg.append(&quot;g&quot;).attr(&quot;class&quot;, &quot;plot&quot;).attr(&quot;transform&quot;, &quot;translate(50,20)&quot;);
+    svg.append(&quot;g&quot;).attr(&quot;class&quot;, &quot;x-axis&quot;).attr(&quot;transform&quot;, &quot;translate(50,230)&quot;);
+    svg.append(&quot;g&quot;).attr(&quot;class&quot;, &quot;y-axis&quot;).attr(&quot;transform&quot;, &quot;translate(50,20)&quot;);
+  });
+
+  // Initial load
+  changeData();
+});
+
+// Loads the selected CSV and logs parsed rows; charts will be added in later prompts
+function changeData() {
+  const file = d3.select(&quot;#dataset&quot;).property(&quot;value&quot;);       // e.g., &quot;route_b.csv&quot;
+  const metric = d3.select(&quot;#metric&quot;).property(&quot;value&quot;);      // &quot;ridership&quot; or &quot;on_time_pct&quot;
+
+  console.log(&quot;Loading:&quot;, `data/${file}`, &quot;metric:&quot;, metric);
+
+  d3.csv(`data/${file}`).then(raw =&gt; {
+    // Parse to the known schema; keep as strings where not needed yet
+    const rows = raw.map(d =&gt; ({
+      date: DATE_PARSE(d.date),
+      group: d.group,
+      ridership: +d.ridership,
+      on_time_pct: +d.on_time_pct,
+      day_type: d.day_type
+    })).filter(d =&gt; d.date);
+
+    rows.sort((a, b) =&gt; a.date - b.date);
+
+    // For this base shell we just log; next steps will draw each chart.
+    console.log(`Loaded ${rows.length} rows from ${file}. Example row:`, rows[0]);
+  }).catch(err =&gt; {
+    console.error(&quot;Failed to load CSV:&quot;, err);
+    alert(&quot;Error loading CSV. Check that data/ exists and filenames match the dropdown.&quot;);
+  });
+}
+</pre>
+      </details>
+    </section>
+  </div>
+</article>
