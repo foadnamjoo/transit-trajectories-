@@ -1,15 +1,120 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-
 <head>
-  <meta charset="UTF-8" />
-  <title>Homework 2</title>
-  <link rel="stylesheet" href="style.css"/>
-  <script src="https://d3js.org/d3.v7.min.js"></script>
+  <meta charset="utf-8" />
+  <title>LLM System-Level Transcript – HW2</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    :root { --fg:#1a1a1a; --muted:#666; --border:#e6e6e6; --bg:#fff; --card:#fafafa; }
+    * { box-sizing:border-box; }
+    body { margin:24px auto; max-width:980px; padding:0 16px; color:var(--fg); background:var(--bg);
+           font: 14px/1.55 system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial; }
+    h1,h2 { margin:.4rem 0; }
+    .meta { color:var(--muted); margin-bottom:12px; }
+    .entry { background:var(--card); border:1px solid var(--border); border-radius:12px; padding:12px 14px; margin:14px 0; }
+    .entry h3 { margin:0 0 6px 0; font-size:16px; }
+    .row { display:grid; grid-template-columns: 1fr; gap:10px; }
+    @media (min-width: 800px) { .row { grid-template-columns: 1fr 1fr; } }
+    details { border:1px dashed var(--border); border-radius:10px; padding:8px 10px; background:#fff; }
+    details summary { cursor:pointer; font-weight:600; margin:-8px -10px 8px; padding:8px 10px; }
+    pre { white-space:pre-wrap; word-wrap:break-word; background:#fff; border:1px solid var(--border); border-radius:8px; padding:10px; margin:0; }
+    code { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace; }
+    .badge { display:inline-block; font-size:12px; color:#fff; background:#6b7280; border-radius:999px; padding:2px 8px; margin-left:8px; }
+    .prompt .badge { background:#2563eb; }
+    .response .badge { background:#059669; }
+  </style>
 </head>
-
 <body>
+  <h1>System-Level LLM Transcript (HW2)</h1>
+  <div class="meta">
+    Put every prompt you sent to the LLM and the full response you got back. No manual edits to the code in <code>llm_system/</code>—only prompt until it’s right.
+  </div>
+
+  <!-- ====== NEW ENTRY TEMPLATE (copy/paste and fill) ====== -->
+  <!--
+  <article class="entry">
+    <h3>Entry #N <span class="badge">system-level</span></h3>
+    <div class="row">
+      <section class="prompt">
+        <h4>Prompt <span class="badge">prompt</span></h4>
+        <pre>
+[Paste exactly what you sent the LLM here]
+        </pre>
+      </section>
+      <section class="response">
+        <h4>Response <span class="badge">response</span></h4>
+        <details open>
+          <summary>Show/Hide</summary>
+          <pre>
+[Paste the full response from the LLM here]
+          </pre>
+        </details>
+      </section>
+    </div>
+  </article>
+  -->
+  <!-- ====== END TEMPLATE ====== -->
+
+  <!-- ====== EXAMPLE ENTRY 1 (you can delete this after you add your own) ====== -->
+  <article class="entry">
+    <h3>Entry #1 <span class="badge">system-level</span></h3>
+    <div class="row">
+      <section class="prompt">
+        <h4>Prompt <span class="badge">prompt</span></h4>
+        <pre>
+You are building HW2 for DS-4630/CS-5630/CS-6630 with D3 v7.
+
+Goal: One page with four charts (Histogram, Line, Stacked Area, Scatterplot).
+Data files: data/route_a.csv, route_b.csv, route_c.csv, route_d.csv
+Schema: date (YYYY-MM-DD), group (string), ridership (int), on_time_pct (float), day_type (Weekday/Weekend/Holiday).
+
+Requirements:
+- Two &lt;select&gt; controls: Dataset (4 routes) and Metric (ridership/on_time_pct).
+- On change, reload data + update all charts.
+- Histogram bins selected metric.
+- Line: x=time, y=selected metric; dots colored by day_type (ColorBrewer Set1 3-class: #e41a1c, #377eb8, #4daf4a).
+- Stacked area: ridership + on_time_pct across time.
+- Scatter: x=ridership, y=on_time_pct, color by day_type.
+- Accessible axes: month ticks on time axes, thousands separators, percent tick labels.
+- Subtle transitions (≤700ms).
+- Create index.html, script.js, style.css. Assume data/ exists at same repo level.
+
+Return ONLY those three files.
+        </pre>
+      </section>
+      <section class="response">
+        <h4>Response <span class="badge">response</span></h4>
+        <details open>
+          <summary>Show/Hide</summary>
+          <pre>
+[Paste the LLM's full reply here: the code for index.html, script.js, style.css]
+          </pre>
+        </details>
+      </section>
+    </div>
+  </article>
+
+  <!-- ====== EXAMPLE ENTRY 2 (optional) ====== -->
+  <article class="entry">
+    <h3>Entry #2 <span class="badge">refinement</span></h3>
+    <div class="row">
+      <section class="prompt">
+        <h4>Prompt <span class="badge">prompt</span></h4>
+        <pre>
+Refine: Use D3 timeMonth ticks for x-axes; add thousands separator for ridership and percent labels for on_time_pct. Use ColorBrewer Set1 (#e41a1c, #377eb8, #4daf4a) for day_type. Make points r=5 with white stroke 1.2px.
+        </pre>
+      </section>
+      <section class="response">
+        <h4>Response <span class="badge">response</span></h4>
+        <details>
+          <summary>Show/Hide</summary>
+          <pre>
+[Paste the refined code response here]
+          </pre>
+        </details>
+      </section>
+    </div>
+  </article>
 
 </body>
-
 </html>
