@@ -1,4 +1,6 @@
-// === Constants & helpers ===
+// ===== Hand-tuned HW2 (root) script.js =====
+
+// --- Constants & helpers ---
 const CHART_WIDTH = 500;
 const CHART_HEIGHT = 260;
 const MARGIN = { left: 50, bottom: 30, top: 20, right: 16 };
@@ -9,17 +11,17 @@ const CATEGORY_FIELD = "day_type";
 const DATE_FIELD = "date";
 const parseDate = d3.timeParse("%Y-%m-%d");
 
-// ColorBrewer Set1 (3-class, colorblind safe)
+const metricNames = {
+  ridership: "Ridership (passengers/day)",
+  on_time_pct: "On-time performance (%)",
+};
+
+// ColorBrewer Set1 (3-class, colorblind-friendly) for day_type
 const dayTypeColor = d3.scaleOrdinal()
   .domain(["Weekday", "Weekend", "Holiday"])
   .range(["#e41a1c", "#377eb8", "#4daf4a"]);
 
-const metricNames = {
-  ridership: "Ridership (passengers/day)",
-  on_time_pct: "On-time performance (%)"
-};
-
-// formatters
+// Formatters
 const fmtInt   = d3.format(",");
 const fmtPct   = d3.format(".0f");
 const monthFmt = d3.timeFormat("%b");
@@ -32,12 +34,11 @@ function xTickFormatFor(metric) {
   return metric === "on_time_pct" ? (d) => fmtPct(d) + "%" : (d) => fmtInt(d);
 }
 
-// --- tooltip (created if missing) ---
+// --- Tooltip (auto-create if missing) ---
 const tip = (function () {
   let t = d3.select("#tooltip");
   if (t.empty()) {
-    t = d3.select("body")
-      .append("div")
+    t = d3.select("body").append("div")
       .attr("id", "tooltip")
       .attr("class", "vis-tooltip")
       .style("opacity", 0);
@@ -53,25 +54,38 @@ function showTip(html, evt) {
 }
 function hideTip() { tip.style("opacity", 0); }
 
-// --- state & refs ---
+// --- State & Refs ---
 let STATE = { rows: [], metricKey: METRIC_MAP.attribute1 };
 const REFS = { hist: null, line: null, stack: null, scat: null };
 
+// --- UI badges for current selections ---
+function updateBadges(){
+  const dsText = d3.select('#dataset').select('option:checked').text();
+  const metricUi = d3.select('#metric').property('value');
+  const mk = METRIC_MAP[metricUi] || METRIC_MAP.attribute1;
+  d3.select('#datasetLabel').text(dsText || '—');
+  d3.select('#metricLabel').text(metricNames[mk] || mk);
+}
+
+// --- Entry point ---
 document.addEventListener("DOMContentLoaded", setup);
 
 function setup () {
-  d3.select("#dataset").on("change", changeData);
+  d3.select("#dataset").on("change", () => { changeData(); updateBadges(); });
   d3.select("#metric").on("change", () => {
     const ui = d3.select("#metric").property("value");
     STATE.metricKey = METRIC_MAP[ui] || METRIC_MAP.attribute1;
+    updateBadges();
     update(STATE.rows);
   });
 
+  // Scaffolds for all charts
   REFS.hist  = makeScaffold("#Histogram-div");
   REFS.line  = makeScaffold("#Linechart-div");
   REFS.stack = makeScaffold("#StackedArea-div");
   REFS.scat  = makeScaffold("#Scatterplot-div");
 
+  updateBadges();
   changeData();
 }
 
@@ -97,11 +111,12 @@ function makeScaffold(sel) {
   return { svg, gPlot, gX, gY, gGridY, xLabel, yLabel, legend, plotW, plotH };
 }
 
-// --- data loader ---
+// --- Data loader ---
 function changeData () {
   const file = d3.select('#dataset').property('value'); // e.g., "route_b.csv"
   const metricUi = d3.select('#metric').property('value');
   STATE.metricKey = METRIC_MAP[metricUi] || METRIC_MAP.attribute1;
+  updateBadges();
 
   d3.csv(`data/${file}`).then(raw => {
     const rows = raw.map(d => ({
@@ -121,7 +136,7 @@ function changeData () {
   });
 }
 
-// --- master redraw ---
+// --- Master redraw ---
 function update (rows) {
   if (!rows?.length) return;
   updateHistogramChart(rows);
@@ -130,7 +145,7 @@ function update (rows) {
   updateScatterPlot(rows);
 }
 
-// --- histogram ---
+// --- Histogram ---
 function updateHistogramChart (rows) {
   const { gPlot, gX, gY, gGridY, xLabel, yLabel, plotW, plotH } = REFS.hist;
   const metric = STATE.metricKey;
@@ -150,10 +165,21 @@ function updateHistogramChart (rows) {
       .attr("y", plotH)
       .attr("height", 0)
       .attr("opacity", 0.95)
+      .on("mousemove", (ev,d) => {
+        const lo = xTickFormatFor(metric)(d.x0), hi = xTickFormatFor(metric)(d.x1);
+        showTip(`<b>${metricNames[metric] || metric}</b><br>Bin: ${lo} – ${hi}<br>Count: ${fmtInt(d.length)}`, ev);
+      })
+      .on("mouseleave", hideTip)
       .transition().duration(ANIMATION_DURATION).ease(d3.easeCubicInOut)
         .attr("y", d => y(d.length))
         .attr("height", d => plotH - y(d.length)),
-    update => update.transition().duration(ANIMATION_DURATION).ease(d3.easeCubicInOut)
+    update => update
+      .on("mousemove", (ev,d) => {
+        const lo = xTickFormatFor(metric)(d.x0), hi = xTickFormatFor(metric)(d.x1);
+        showTip(`<b>${metricNames[metric] || metric}</b><br>Bin: ${lo} – ${hi}<br>Count: ${fmtInt(d.length)}`, ev);
+      })
+      .on("mouseleave", hideTip)
+      .transition().duration(ANIMATION_DURATION).ease(d3.easeCubicInOut)
         .attr("x", d => x(d.x0) + 1)
         .attr("width", d => Math.max(0, x(d.x1) - x(d.x0) - 1))
         .attr("y", d => y(d.length))
@@ -175,9 +201,9 @@ function updateHistogramChart (rows) {
   yLabel.text("Count");
 }
 
-// --- line chart ---
+// --- Line chart ---
 function updateLineChart (rows) {
-  const { gPlot, gX, gY, gGridY, xLabel, yLabel, plotW, plotH } = REFS.line;
+  const { gPlot, gX, gY, gGridY, xLabel, yLabel, legend, plotW, plotH } = REFS.line;
   const metric = STATE.metricKey;
 
   const x = d3.scaleTime().domain(d3.extent(rows, d => d.date)).range([0, plotW]);
@@ -200,7 +226,7 @@ function updateLineChart (rows) {
       .attr("opacity", 0).remove()
   );
 
-  // dots (FIXED: use date & selected metric)
+  // dots (date vs selected metric)
   const dots = gPlot.selectAll("circle.pt").data(rows, d => +d.date);
   dots.join(
     enter => enter.append("circle")
@@ -233,11 +259,25 @@ function updateLineChart (rows) {
   gGridY.call(d3.axisLeft(y).ticks(5).tickSize(-plotW).tickFormat(""))
         .selectAll("line").attr("class", "gridline");
 
+  // Legend (Day type)
+  if (legend.select("text.legend-title").empty()) {
+    legend.append("text").attr("class","legend-title").attr("x",0).attr("y",-6)
+      .style("font-size","12px").style("font-weight","600").text("Day type");
+  }
+  const cats = dayTypeColor.domain();
+  const items = legend.selectAll("g.item").data(cats, d => d);
+  const enter = items.enter().append("g").attr("class","item")
+    .attr("transform",(d,i)=>`translate(0,${i*18})`);
+  enter.append("rect").attr("width",12).attr("height",12);
+  enter.append("text").attr("x",18).attr("y",10);
+  items.merge(enter).select("rect").attr("fill", d => dayTypeColor(d));
+  items.merge(enter).select("text").text(d => d).style("font-size","12px");
+
   xLabel.text("Date");
   yLabel.text(metricNames[metric] || metric);
 }
 
-// --- stacked area ---
+// --- Stacked area ---
 function updateStackedAreaChart (rows) {
   const { gPlot, gX, gY, gGridY, xLabel, yLabel, legend, plotW, plotH } = REFS.stack;
 
@@ -247,8 +287,8 @@ function updateStackedAreaChart (rows) {
   const x = d3.scaleTime().domain(d3.extent(table, d => d.date)).range([0, plotW]);
   const stack = d3.stack().keys(keys)(table);
   const y = d3.scaleLinear().domain([0, d3.max(stack[stack.length - 1], d => d[1]) || 1]).nice().range([plotH, 0]);
+
   const area = d3.area().x(d => x(d.data.date)).y0(d => y(d[0])).y1(d => y(d[1]));
-  // nicer palette for variables
   const col = d3.scaleOrdinal().domain(keys).range(["#66c2a5", "#fc8d62"]); // Set2
 
   const layers = gPlot.selectAll("path.layer").data(stack, d => d.key);
@@ -259,7 +299,7 @@ function updateStackedAreaChart (rows) {
       .attr("d", area)
       .attr("opacity", 0)
       .transition().duration(ANIMATION_DURATION).ease(d3.easeCubicInOut)
-        .attr("opacity", 0.95),
+        .attr("opacity", 0.96),
     update => update.transition().duration(ANIMATION_DURATION).ease(d3.easeCubicInOut)
       .attr("d", area),
     exit => exit.transition().duration(300).ease(d3.easeCubicInOut)
@@ -275,30 +315,24 @@ function updateStackedAreaChart (rows) {
   gGridY.call(d3.axisLeft(y).ticks(5).tickSize(-plotW).tickFormat(""))
         .selectAll("line").attr("class", "gridline");
 
-  // legend (with title)
+  // Legend (Variables)
   if (legend.select("text.legend-title").empty()) {
-    legend.append("text")
-      .attr("class", "legend-title")
-      .attr("x", 0)
-      .attr("y", -6)
-      .style("font-size", "12px")
-      .style("font-weight", "600")
-      .text("Variables");
+    legend.append("text").attr("class","legend-title").attr("x",0).attr("y",-6)
+      .style("font-size","12px").style("font-weight","600").text("Variables");
   }
   const items = legend.selectAll("g.item").data(keys, d => d);
-  const enter = items.enter().append("g").attr("class", "item");
-  enter.append("rect").attr("width", 12).attr("height", 12);
-  enter.append("text").attr("x", 18).attr("y", 10);
-  items.merge(enter)
-    .attr("transform", (d, i) => `translate(0, ${i*18})`)
-    .select("rect").attr("fill", d => col(d));
-  items.merge(enter).select("text").text(d => d).style("font-size", "12px");
+  const enter = items.enter().append("g").attr("class","item")
+    .attr("transform",(d,i)=>`translate(0,${i*18})`);
+  enter.append("rect").attr("width",12).attr("height",12);
+  enter.append("text").attr("x",18).attr("y",10);
+  items.merge(enter).select("rect").attr("fill", d => col(d));
+  items.merge(enter).select("text").text(d => d).style("font-size","12px");
 
   xLabel.text("Date");
   yLabel.text("Stacked value");
 }
 
-// --- scatter ---
+// --- Scatterplot ---
 function updateScatterPlot (rows) {
   const { gPlot, gX, gY, gGridY, xLabel, yLabel, legend, plotW, plotH } = REFS.scat;
 
@@ -313,7 +347,7 @@ function updateScatterPlot (rows) {
       .attr("cx", d => x(d.ridership))
       .attr("cy", d => y(d.on_time_pct))
       .attr("fill", d => dayTypeColor(d.day_type))
-      .attr("opacity", 0.9)
+      .attr("opacity", 0.92)
       .on("mousemove", (ev,d) => {
         showTip(
           `<b>${fullDate(d.date)}</b><br>Ridership: ${fmtInt(d.ridership)}<br>On-time: ${fmtPct(d.on_time_pct)}%<br>${d.day_type}`,
@@ -337,25 +371,19 @@ function updateScatterPlot (rows) {
   gGridY.call(d3.axisLeft(y).ticks(5).tickSize(-plotW).tickFormat(""))
         .selectAll("line").attr("class", "gridline");
 
-  // legend (with title)
+  // Legend (Day type) — keep in scatter too for quick reference
   if (legend.select("text.legend-title").empty()) {
-    legend.append("text")
-      .attr("class", "legend-title")
-      .attr("x", 0)
-      .attr("y", -6)
-      .style("font-size", "12px")
-      .style("font-weight", "600")
-      .text("Day type");
+    legend.append("text").attr("class","legend-title").attr("x",0).attr("y",-6)
+      .style("font-size","12px").style("font-weight","600").text("Day type");
   }
   const cats = dayTypeColor.domain();
   const items = legend.selectAll("g.item").data(cats, d => d);
-  const enter = items.enter().append("g").attr("class", "item");
-  enter.append("rect").attr("width", 12).attr("height", 12);
-  enter.append("text").attr("x", 18).attr("y", 10);
-  items.merge(enter)
-    .attr("transform", (d, i) => `translate(0, ${i*18})`)
-    .select("rect").attr("fill", d => dayTypeColor(d));
-  items.merge(enter).select("text").text(d => d).style("font-size", "12px");
+  const enter = items.enter().append("g").attr("class","item")
+    .attr("transform",(d,i)=>`translate(0,${i*18})`);
+  enter.append("rect").attr("width",12).attr("height",12);
+  enter.append("text").attr("x",18).attr("y",10);
+  items.merge(enter).select("rect").attr("fill", d => dayTypeColor(d));
+  items.merge(enter).select("text").text(d => d).style("font-size","12px");
 
   xLabel.text("Ridership");
   yLabel.text("On-time (%)");
