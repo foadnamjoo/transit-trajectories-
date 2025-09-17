@@ -1,72 +1,56 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-
 <head>
-  <meta charset="UTF-8" />
-  <title>Homework 2</title>
-  <link rel="stylesheet" href="style.css"/>
-  <script src="https://d3js.org/d3.v7.min.js"></script>
+  <meta charset="utf-8" />
+  <title>HW2 – llm_vis (Histogram Step)</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <link rel="stylesheet" href="style.css" />
+  <script src="https://d3js.org/d3.v7.min.js" defer></script>
+  <script src="script.js?v=2" defer></script>
 </head>
-
 <body>
-  <h3>DS-4630 / CS-5630 / CS-6630 Homework 2</h3>
-  <h4>LLM Generated Per-Visualization</h4>
-  <address>
-    <span>Your Name</span>
-    <span>Your Email</span>
-    <span>Your UID</span>
-  </address>
-  <br />
-  <a href="llm_transcript.html">LLM Transcript</a>
-  <hr />
-  <br />
+  <header class="top">
+    <h1>HW2 – llm_vis</h1>
+    <div class="controls">
+      <label>Dataset:
+        <select id="dataset">
+          <option value="route_a.csv" selected>route_a.csv</option>
+          <option value="route_b.csv">route_b.csv</option>
+          <option value="route_c.csv">route_c.csv</option>
+          <option value="route_d.csv">route_d.csv</option>
+        </select>
+      </label>
 
-  <div class="toolbox">
-
-    <span>
-      <label>Dataset:</label>
-      <select id="dataset">
-        <option selected value="dataset1">Dataset 1</option>
-        <option value="dataset2">Dataset 2</option>
-        <option value="dataset3">Dataset 3</option>
-        <option value="dataset4">Dataset 4</option>
-      </select>
-    </span>
-    <span>
-      <label>Data Metric</label>
-      <select id="metric">
-        <option value="attribute1">Attribute 1</option>
-        <option value="attribute2">Attribute 2</option>
-      </select>
-    </span>
-  </div>
-  <br />
-
-  <div class="row chart">
-    <div class="chart">
-      <h2>Histogram Charts</h2>
-      <div id="Histogram-div">
-      </div>
+      <label>Metric:
+        <select id="metric">
+          <option value="ridership" selected>ridership</option>
+          <option value="on_time_pct">on_time_pct</option>
+        </select>
+      </label>
     </div>
+  </header>
 
-    <div class="chart">
-      <h2>Line Charts</h2>
+  <main class="grid">
+    <section class="chart">
+      <h2>Histogram</h2>
+      <div id="Histogram-div"></div>
+    </section>
+
+    <section class="chart">
+      <h2>Line</h2>
       <div id="Linechart-div"></div>
-    </div>
-  </div>
+    </section>
 
-  <div class="row chart">
-    <div class="chart">
-      <h2>Stacked Area Charts</h2>
+    <section class="chart">
+      <h2>Stacked Area</h2>
       <div id="StackedArea-div"></div>
-    </div>
+    </section>
 
-    <div class="chart">
-      <h2>Scatterplot</h2>
+    <section class="chart">
+      <h2>Scatter</h2>
       <div id="Scatterplot-div"></div>
-    </div>
-  </div>
+    </section>
+  </main>
 </body>
-<script src="script.js"></script>
-
 </html>
