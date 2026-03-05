@@ -2,66 +2,66 @@
 <html lang="en">
 <head>
   <meta charset="utf-8" />
-  <title>HW2 – Visualization for Data Science (Hand-Tuned)</title>
+  <title>Transit Trajectories — Route, Fleet & Map Analytics</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="" />
 
-  <!-- D3 then your script (cache-busted) -->
+  <!-- D3, Leaflet, script -->
   <script src="https://d3js.org/d3.v7.min.js" defer></script>
-  <script src="script.js?v=7" defer></script>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin="" defer></script>
+  <script src="script.js?v=8" defer></script>
 </head>
 <body>
   <header class="site-header">
     <div class="container">
       <div class="header-left">
-        <h1>CS-6630 • Homework 2</h1>
-        <p class="subtitle">Hand-Tuned Visualization Dashboard</p>
+        <h1>Transit Trajectories</h1>
+        <p class="subtitle">Route, fleet & map analytics</p>
         <address class="meta">
-          <span><strong>Name:</strong> Foad Namjoo</span>
-          <span><strong>Email:</strong> <a href="mailto:foad.namjoo@utah.edu">foad.namjoo@utah.edu</a></span>
-          <div><strong>Homepage:</strong> <a href="https://users.cs.utah.edu/~foad27/" rel="noopener">Personal Webpage</a></div>
-          <span><strong>UID:</strong> u1419668</span>
+          <span><strong>Homepage:</strong> <a href="https://users.cs.utah.edu/~foad27/" rel="noopener">Personal Webpage</a></span>
         </address>
       </div>
-
-      <nav class="header-links">
-        <a href="llm_system/index.html" aria-label="System-level LLM build">LLM System</a>
-        <a href="llm_vis/index.html" aria-label="Per-visualization LLM build">LLM Per-Vis</a>
-      </nav>
     </div>
   </header>
 
-  <!-- Sticky toolbar with professional controls -->
+  <!-- Toolbar: Section, Route, Metric in one row -->
   <section class="toolbar">
-    <div class="container toolbar-inner" aria-label="Controls">
+    <div class="container toolbar-inner toolbar-row" aria-label="Controls">
       <div class="control">
-        <label for="dataset">Dataset</label>
+        <label for="section-select">Section</label>
+        <select id="section-select" class="select" aria-label="Select section">
+          <option value="overview" selected>Overview</option>
+          <option value="map">Map & routes</option>
+          <option value="fleet">Fleet & cost</option>
+        </select>
+      </div>
+      <div class="control">
+        <label for="dataset">Route</label>
         <select id="dataset" name="dataset" class="select">
-          <option value="route_a.csv" selected>Dataset 1 (Route A)</option>
-          <option value="route_b.csv">Dataset 2 (Route B)</option>
-          <option value="route_c.csv">Dataset 3 (Route C)</option>
-          <option value="route_d.csv">Dataset 4 (Route D)</option>
+          <option value="route_a.csv" selected>Route A</option>
+          <option value="route_b.csv">Route B</option>
+          <option value="route_c.csv">Route C</option>
+          <option value="route_d.csv">Route D</option>
+          <option value="route_e.csv">Route E</option>
+          <option value="route_f.csv">Route F</option>
         </select>
       </div>
-
       <div class="control">
-        <label for="metric">Data Metric</label>
+        <label for="metric">Metric</label>
         <select id="metric" name="metric" class="select">
-          <option value="attribute1" selected>Attribute 1 — Ridership</option>
-          <option value="attribute2">Attribute 2 — On-time %</option>
+          <option value="attribute1" selected>Ridership</option>
+          <option value="attribute2">On-time %</option>
         </select>
-      </div>
-
-      <div class="status">
-        <span class="label">Current:</span>
-        <span id="datasetLabel" class="badge">Dataset 1 (Route A)</span>
-        <span id="metricLabel" class="badge">Ridership (passengers/day)</span>
       </div>
     </div>
   </section>
 
-  <!-- 2x2 side-by-side responsive grid -->
+  <!-- Panel: Overview (charts only) -->
+  <section id="panel-overview" class="panel active" role="tabpanel" aria-labelledby="section-select">
+
+  <!-- 2x2 responsive grid -->
   <main class="container charts">
     <section class="chart-card">
       <div class="chart-head">
@@ -81,10 +81,10 @@
 
     <section class="chart-card">
       <div class="chart-head">
-        <h3>Stacked Area</h3>
-        <p class="caption">Cumulative view of ridership and on-time % over time.</p>
+        <h3>Time series</h3>
+        <p class="caption">Ridership and on-time % over time (two lines).</p>
       </div>
-      <div id="StackedArea-div" class="chart-plot"></div>
+      <div id="TimeSeries-div" class="chart-plot"></div>
     </section>
 
     <section class="chart-card">
@@ -95,6 +95,52 @@
       <div id="Scatterplot-div" class="chart-plot"></div>
     </section>
   </main>
+
+  </section>
+  <!-- end panel-overview -->
+
+  <!-- Panel: City map & route trajectories -->
+  <section id="panel-map" class="panel" role="tabpanel" aria-labelledby="section-select">
+    <div class="container map-section">
+      <div class="chart-card map-card">
+        <div class="chart-head">
+          <h3>Route trajectories</h3>
+          <p class="caption">Salt Lake City transit routes (e.g. Route A: Airport → University). Toggle routes; click to highlight. S = Start, E = End.</p>
+        </div>
+        <div class="map-legend" id="map-legend"></div>
+        <div id="city-map-container" class="city-map-container">
+          <div id="city-map" class="city-map"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Panel: Fleet & cost -->
+  <section id="panel-fleet" class="panel" role="tabpanel" aria-labelledby="section-select">
+    <div class="container fleet-section">
+      <section class="chart-card">
+        <div class="chart-head">
+          <h3>Fuel consumption over time</h3>
+          <p class="caption">Daily fuel (L) for the selected route.</p>
+        </div>
+        <div id="FuelChart-div" class="chart-plot"></div>
+      </section>
+      <section class="chart-card">
+        <div class="chart-head">
+          <h3>Total cost by route</h3>
+          <p class="caption">Aggregate cost (USD) across the period for all routes.</p>
+        </div>
+        <div id="CostByRoute-div" class="chart-plot"></div>
+      </section>
+      <section class="chart-card">
+        <div class="chart-head">
+          <h3>Vehicle type usage</h3>
+          <p class="caption">Days operated by vehicle type for the selected route.</p>
+        </div>
+        <div id="VehicleBreakdown-div" class="chart-plot"></div>
+      </section>
+    </div>
+  </section>
 
   <!-- Tooltip for charts -->
   <div id="tooltip" class="vis-tooltip" style="opacity:0"></div>
