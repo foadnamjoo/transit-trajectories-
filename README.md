@@ -1,35 +1,59 @@
-# HW2 — Visualization for Data Science
-**Course:** CS-6630  
-**Student:** Foad Namjoo (u1419668) · foad.namjoo@utah.edu
+# Transit Trajectories
 
-This repository contains three deliverables:
-1) **Hand-tuned final** (root: `index.html`, `script.js`, `style.css`)  
-2) **LLM system-level build** (`/llm_system`)  
-3) **LLM per-visualization build** (`/llm_vis`)  
+Interactive transit analytics dashboard with route trajectories on a live map, fleet metrics, and time-series visualizations. Built with D3.js and Leaflet (OpenStreetMap).
 
-Each LLM folder includes its own `index.html`, assets, and a **full transcript** (`llm_transcript.html`) with prompts and the model’s responses.
+## What is this?
 
+A web-based visualization tool for exploring transit route performance in Salt Lake City. It combines:
 
-## Thumbnails
-Quick preview of the four charts (exported from the app):
+- **Overview** — Histogram, line chart, time series, and scatterplot of ridership and on-time performance across 6 routes (A–F)
+- **Map & routes** — Route trajectories on an interactive OpenStreetMap, with start (S) and end (E) markers (e.g., Route A: Airport → University of Utah)
+- **Fleet & cost** — Fuel consumption over time, total cost by route, and vehicle type usage (Hybrid, Diesel, CNG)
 
+## How to use
 
-<p align="center">
-  <img src="./thumbnails/histogram.png" width="260" alt="Histogram" />
-  <img src="./thumbnails/line.png" width="260" alt="Line chart" />
-  <img src="./thumbnails/stacked.png" width="260" alt="Stacked area" />
-  <img src="./thumbnails/scatter.png" width="260" alt="Scatterplot" />
-</p>
+1. **Run locally**
+   ```bash
+   python3 -m http.server 8080
+   ```
+   Then open [http://localhost:8080](http://localhost:8080)
 
+2. **Navigate**
+   - Use the **Section** dropdown: Overview, Map & routes, Fleet & cost
+   - **Route** — Select Route A through F
+   - **Metric** — Ridership or On-time %
 
+3. **Overview**
+   - Charts respond to route and metric selection
+   - Click legend items (day type) to filter by Weekday / Weekend / Holiday
 
----
+4. **Map**
+   - Routes show trajectories between SLC landmarks (airport, university, downtown, etc.)
+   - Use checkboxes to show or hide routes
+   - Click a route to highlight it; hover for details
 
-## How to run
-```bash
-# from repo root
-python3 -m http.server 8080
-# then open:
-# hand-tuned (final):   http://localhost:8080/
-# system-level build:   http://localhost:8080/llm_system/
-# per-visualization:    http://localhost:8080/llm_vis/
+5. **Fleet & cost**
+   - Fuel and cost charts update when you change the selected route
+
+## Tech stack
+
+- **D3.js v7** — Charts and visualizations
+- **Leaflet** — Interactive map with OpenStreetMap tiles
+- **Plain HTML/CSS/JS** — No build step; open in a browser after serving
+
+## Project structure
+
+```
+├── index.html          # Main app
+├── script.js           # D3 charts, map, data logic
+├── style.css           # Styles
+├── data/
+│   ├── route_a.csv … route_f.csv   # Route data (ridership, on-time %, vehicle type, fuel, cost)
+│   └── route_trajectories.json     # Lat/lng waypoints for each route
+└── scripts/
+    └── enrich-data.js  # Adds synthetic vehicle/fuel/cost columns; run: node scripts/enrich-data.js
+```
+
+## Author
+
+**Foad Namjoo** · [Personal Webpage](https://users.cs.utah.edu/~foad27/)
