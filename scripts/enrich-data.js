@@ -18,6 +18,12 @@ const ROUTE_BIAS = {
   route_e: [0.20, 0.50, 0.30],
   route_f: [0.35, 0.20, 0.45],
 };
+// Approximate tailpipe CO2 factors (kg per liter of fuel-equivalent)
+const EMISSION_FACTORS = {
+  Hybrid: 1.6,
+  Diesel: 2.68,
+  CNG: 2.0,
+};
 function vehicleForDay(dayIndex, routeName) {
   const bias = ROUTE_BIAS[routeName] || [0.33, 0.33, 0.34];
   const r = (dayIndex * 17 + routeName.split("").reduce((a, c) => a + c.charCodeAt(0), 0)) % 100 / 100;
@@ -36,11 +42,18 @@ function enrichRow(d, dayIndex, routeKey) {
   const r = seed(routeKey, dayIndex);
   const fuelLiters = Math.round((35 + ridership * 0.055 + r * 8) * 10) / 10;
   const costUsd = Math.round((65 + fuelLiters * 1.4 + r * 12) * 100) / 100;
+  const vehicleType = vehicleForDay(
+    dayIndex,
+    routeKey.replace(/^Route\s*/i, "route_").toLowerCase().replace(/\s/g, "_")
+  );
+  const factor = EMISSION_FACTORS[vehicleType] ?? 2.2;
+  const co2Kg = Math.round(fuelLiters * factor * 10) / 10;
   return {
     ...d,
-    vehicle_type: vehicleForDay(dayIndex, routeKey.replace(/^Route\s*/i, "route_").toLowerCase().replace(/\s/g, "_")),
+    vehicle_type: vehicleType,
     fuel_liters: fuelLiters,
     cost_usd: costUsd,
+    co2_kg: co2Kg,
   };
 }
 
@@ -54,11 +67,12 @@ function toCsvRow(obj) {
     obj.vehicle_type || "Hybrid",
     (obj.fuel_liters ?? 0).toFixed(1),
     (obj.cost_usd ?? 0).toFixed(2),
+    (obj.co2_kg ?? 0).toFixed(1),
   ].join(",");
 }
 
 const header =
-  "date,group,ridership,on_time_pct,day_type,vehicle_type,fuel_liters,cost_usd";
+  "date,group,ridership,on_time_pct,day_type,vehicle_type,fuel_liters,cost_usd,co2_kg";
 
 // Enrich existing route_a .. route_d
 for (const name of ["route_a", "route_b", "route_c", "route_d"]) {

@@ -64,6 +64,7 @@ function showTip(html, evt) {
 function hideTip() { tip.style("opacity", 0); }
 
 // --- State & Refs ---
+const DATA_VERSION = "2"; // bump to bypass cache when data files change
 let STATE = { rows: [], metricKey: METRIC_MAP.attribute1, allRoutes: null, trajectories: null };
 const REFS = { hist: null, line: null, timeSeries: null, scat: null, fuel: null, costByRoute: null, vehicleBreakdown: null };
 const ROUTE_FILES = ["route_a.csv", "route_b.csv", "route_c.csv", "route_d.csv", "route_e.csv", "route_f.csv"];
@@ -130,7 +131,7 @@ function switchPanel(name) {
 
 function loadAllRoutes() {
   if (STATE.allRoutes) return Promise.resolve(STATE.allRoutes);
-  return Promise.all(ROUTE_FILES.map(f => d3.csv(`data/${f}`))).then(rawArrays => {
+  return Promise.all(ROUTE_FILES.map(f => d3.csv(`data/${f}?v=${DATA_VERSION}`))).then(rawArrays => {
     const out = {};
     ROUTE_FILES.forEach((f, i) => {
       const raw = rawArrays[i];
@@ -157,18 +158,28 @@ function loadAllRoutes() {
 function initMapPanel() {
   const container = d3.select("#city-map");
   if (STATE.leafletMap) return;
+  function drawWhenReady() {
+    requestAnimationFrame(() => {
+      const el = document.getElementById("city-map");
+      if (el && el.offsetParent !== null && el.offsetWidth > 0 && el.offsetHeight > 0) {
+        drawLeafletMap();
+        renderMapLegend();
+        return;
+      }
+      setTimeout(drawWhenReady, 50);
+    });
+  }
+
   if (!STATE.trajectories) {
     container.html("<p class='map-loading'>Loading routes…</p>");
-    d3.json("data/route_trajectories.json").then(traj => {
+    d3.json(`data/route_trajectories.json?v=${DATA_VERSION}`).then(traj => {
       STATE.trajectories = traj;
       container.html("");
-      drawLeafletMap();
-      renderMapLegend();
+      drawWhenReady();
     }).catch(() => container.html("<p class='map-loading'>Could not load route data.</p>"));
   } else {
     container.html("");
-    drawLeafletMap();
-    renderMapLegend();
+    drawWhenReady();
   }
 }
 
@@ -186,6 +197,9 @@ function drawLeafletMap() {
     maxZoom: 19
   }).addTo(map);
 
+  const routePane = map.createPane("routes");
+  routePane.style.zIndex = 450;
+
   const routeLayers = {};
   const routeMarkers = {};
   const allBounds = [];
@@ -196,8 +210,9 @@ function drawLeafletMap() {
 
     const polyline = L.polyline(coords, {
       color: routeColor(routeName),
-      weight: 8,
-      opacity: 0.95
+      weight: 10,
+      opacity: 1,
+      pane: "routes"
     }).addTo(map);
 
     polyline.on("mouseover", function() {
@@ -205,12 +220,12 @@ function drawLeafletMap() {
     });
     polyline.on("mouseout", function() {
       if (STATE.highlightedRoute !== routeName)
-        this.setStyle({ weight: 8, opacity: 0.95 });
+        this.setStyle({ weight: 10, opacity: 1 });
     });
     polyline.on("click", function() {
       STATE.highlightedRoute = STATE.highlightedRoute === routeName ? null : routeName;
       Object.keys(routeLayers).forEach(r => {
-        routeLayers[r].setStyle({ weight: 8, opacity: STATE.highlightedRoute === r ? 1 : 0.4 });
+        routeLayers[r].setStyle({ weight: 10, opacity: STATE.highlightedRoute === r ? 1 : 0.4 });
       });
       if (STATE.highlightedRoute) routeLayers[routeName].bringToFront();
     });
@@ -241,13 +256,17 @@ function drawLeafletMap() {
     allBounds.push(L.latLngBounds(coords));
   });
 
+  let combinedBounds = null;
   if (allBounds.length) {
-    const combined = allBounds[0];
-    allBounds.forEach(b => combined.extend(b));
-    map.fitBounds(combined.pad(0.15));
+    combinedBounds = allBounds[0].clone();
+    allBounds.forEach(b => combinedBounds.extend(b));
+    map.fitBounds(combinedBounds.pad(0.15));
   }
 
-  setTimeout(() => map.invalidateSize(), 100);
+  setTimeout(() => {
+    map.invalidateSize();
+    if (combinedBounds) map.fitBounds(combinedBounds.pad(0.15));
+  }, 150);
   STATE.leafletMap = map;
   STATE.routeLayers = routeLayers;
   STATE.routeMarkers = routeMarkers;
@@ -290,7 +309,10 @@ function initFleetPanel() {
 
 function updateFleetCharts(rows) {
   if (!rows || !rows.length) return;
-  const hasFuel = rows.some(d => d.fuel_liters != null && isFinite(d.fuel_liters));
+  const hasFuel = rows.some(d =>
+    (d.fuel_liters != null && isFinite(d.fuel_liters)) ||
+    (d.co2_kg != null && isFinite(d.co2_kg))
+  );
   const hasVehicle = rows.some(d => d.vehicle_type);
   if (hasFuel) updateFuelChart(rows); else clearChartPlaceholder(REFS.fuel, "No fuel data for this route.");
   if (hasVehicle) updateVehicleBreakdown(rows); else clearChartPlaceholder(REFS.vehicleBreakdown, "No vehicle type data.");
@@ -309,12 +331,34 @@ function updateFuelChart(rows) {
   const { gPlot, gX, gY, gGridY, xLabel, yLabel, plotW, plotH } = ref;
 
   const x = d3.scaleTime().domain(d3.extent(rows, d => d.date)).range([0, plotW]);
-  const y = d3.scaleLinear().domain([0, d3.max(rows, d => d.fuel_liters) || 1]).nice().range([plotH, 0]);
-  const line = d3.line().x(d => x(d.date)).y(d => y(d.fuel_liters)).curve(d3.curveMonotoneX);
+  const y = d3.scaleLinear().domain([
+    0,
+    d3.max(rows, d => d.co2_kg != null ? d.co2_kg : d.fuel_liters) || 1
+  ]).nice().range([plotH, 0]);
+  const line = d3.line()
+    .x(d => x(d.date))
+    .y(d => y(d.co2_kg != null ? d.co2_kg : d.fuel_liters))
+    .curve(d3.curveMonotoneX);
 
   gPlot.selectAll("path.fuel-area").remove();
-  gPlot.selectAll("path.fuel-line").data([rows]).join("path").attr("class", "fuel-line line").attr("stroke", "#1170aa").attr("stroke-width", 2.5).attr("d", line)
-    .on("mousemove", (ev, d) => { if (d && d.length) { const last = d[d.length - 1]; showTip(`<b>Fuel (L)</b><br>Latest: ${fmtInt(last.fuel_liters)} L`, ev); } })
+  gPlot.selectAll("path.fuel-line").data([rows]).join("path")
+    .attr("class", "fuel-line line")
+    .attr("stroke", "#1170aa")
+    .attr("stroke-width", 2.5)
+    .attr("d", line)
+    .on("mousemove", (ev, d) => {
+      if (d && d.length) {
+        const last = d[d.length - 1];
+        const fuel = last.fuel_liters;
+        const co2 = last.co2_kg;
+        showTip(
+          `<b>Emissions & fuel</b><br>` +
+          (co2 != null ? `CO₂: ${fmtInt(co2)} kg<br>` : "") +
+          (fuel != null ? `Fuel: ${fmtInt(fuel)} L` : ""),
+          ev
+        );
+      }
+    })
     .on("mouseleave", hideTip);
 
   const axisX = d3.axisBottom(x).ticks(d3.timeMonth.every(1)).tickSizeOuter(0).tickPadding(10).tickFormat(monthFmt);
@@ -323,7 +367,7 @@ function updateFuelChart(rows) {
   gY.call(axisY);
   gGridY.call(d3.axisLeft(y).ticks(5).tickSize(-plotW).tickFormat("")).selectAll("line").attr("class", "gridline").attr("stroke-opacity", 0.6);
   xLabel.text("Date");
-  yLabel.text("Fuel (L)");
+  yLabel.text("Tailpipe CO\u2082 (kg)");
 }
 
 function updateCostByRoute(all) {
@@ -458,7 +502,7 @@ function changeData () {
   STATE.metricKey = METRIC_MAP[metricUi] || METRIC_MAP.attribute1;
   updateBadges();
 
-  d3.csv(`data/${file}`).then(raw => {
+  d3.csv(`data/${file}?v=${DATA_VERSION}`).then(raw => {
     const rows = raw.map(d => {
       const r = {
         date: parseDate(d[DATE_FIELD]),
@@ -470,6 +514,7 @@ function changeData () {
       if (d.vehicle_type != null && d.vehicle_type !== "") r.vehicle_type = d.vehicle_type;
       if (d.fuel_liters != null && d.fuel_liters !== "") r.fuel_liters = +d.fuel_liters;
       if (d.cost_usd != null && d.cost_usd !== "") r.cost_usd = +d.cost_usd;
+      if (d.co2_kg != null && d.co2_kg !== "") r.co2_kg = +d.co2_kg;
       return r;
     }).filter(d => d.date && isFinite(d.ridership) && isFinite(d.on_time_pct));
 

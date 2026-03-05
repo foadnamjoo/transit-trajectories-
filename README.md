@@ -19,7 +19,7 @@ A web-based visualization tool for exploring transit route performance in Salt L
    Then open [http://localhost:8080](http://localhost:8080)
 
 2. **Navigate**
-   - Use the **Section** dropdown: Overview, Map & routes, Fleet & cost
+   - Use the **View** dropdown: Performance overview, Routes & map, Fleet & emissions
    - **Route** — Select Route A through F
    - **Metric** — Ridership or On-time %
 
@@ -32,8 +32,8 @@ A web-based visualization tool for exploring transit route performance in Salt L
    - Use checkboxes to show or hide routes
    - Click a route to highlight it; hover for details
 
-5. **Fleet & cost**
-   - Fuel and cost charts update when you change the selected route
+5. **Fleet & emissions**
+   - Emissions-over-time, cost, and vehicle mix charts update when you change the selected route
 
 ## Tech stack
 
@@ -48,7 +48,7 @@ A web-based visualization tool for exploring transit route performance in Salt L
 ├── script.js           # D3 charts, map, data logic
 ├── style.css           # Styles
 ├── data/
-│   ├── route_a.csv … route_f.csv   # Route data (ridership, on-time %, vehicle type, fuel, cost)
+│   ├── route_a.csv … route_f.csv   # Route data (ridership, on-time %, vehicle type, fuel, cost, CO2)
 │   └── route_trajectories.json     # Lat/lng waypoints for each route
 └── scripts/
     └── enrich-data.js  # Adds synthetic vehicle/fuel/cost columns; run: node scripts/enrich-data.js
