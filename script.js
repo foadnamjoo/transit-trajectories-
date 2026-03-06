@@ -198,6 +198,9 @@ function setup () {
       if (titleBar) titleBar.textContent = title;
       modal.classList.add("is-open");
       modal.setAttribute("aria-hidden", "false");
+      document.body.style.overflow = "hidden";
+      const closeBtn = document.querySelector(".chart-modal-close");
+      if (closeBtn) closeBtn.focus();
     });
   }
   function closeChartModal() {
@@ -205,6 +208,7 @@ function setup () {
     if (!modal) return;
     modal.classList.remove("is-open");
     modal.setAttribute("aria-hidden", "true");
+    document.body.style.overflow = "";
     const body = document.querySelector(".chart-modal-body");
     if (body) body.innerHTML = "";
   }

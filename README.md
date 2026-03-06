@@ -32,9 +32,9 @@ Transit operations teams need to monitor **reliability, cost, and emissions** ac
 └──────────────────────────────┬──────────────────────────────────────────┘
                                ▼
 ┌─────────────────────────────────────────────────────────────────────────┐
-│  Web dashboard      (D3 + Leaflet)                                       │
-│  Tabs: Summary | Forecast | Data Quality                                │
-│  Loads: data/serving/*.csv, *.json                                       │
+│  Web dashboard      (D3)                                                 │
+│  Single Summary view: KPI cards + 10 charts (incl. Forecast & Quality)   │
+│  Loads: data/serving/*.csv, *.json; click chart → zoom modal + resize     │
 └─────────────────────────────────────────────────────────────────────────┘
 ```
 
@@ -74,7 +74,7 @@ Transit operations teams need to monitor **reliability, cost, and emissions** ac
 make demo
 ```
 
-Runs the full pipeline then starts a static server at **http://localhost:8080**. Open the app and use **View** → Summary, Forecast, Data Quality.
+Runs the full pipeline then starts a static server at **http://localhost:8080**. Open the app; the dashboard shows a single **Summary** view with KPI cards and all charts (histogram, line, time series, scatter, emissions, cost, vehicle usage, ridership by route, forecast, data quality). Use the Route and Metric dropdowns to filter. Click any chart to open it in a larger modal (drag to pan, scroll to zoom, drag the corner to resize).
 
 ### Pipeline only (no server)
 
@@ -134,7 +134,7 @@ CI (`.github/workflows/ci.yml`) runs on push/PR: install deps, compile Python, r
 
 ```
 ├── index.html              # Dashboard entry
-├── script.js               # D3 charts, Leaflet map, tabs, KPI/forecast/quality views
+├── script.js               # D3 charts, KPI cards, forecast/quality, chart modal (pan/zoom/resize)
 ├── style.css               # Styles
 ├── Makefile                # demo | pipeline | serve | test | lint
 ├── requirements.txt        # pandas, numpy, scikit-learn, pandera, pytest
@@ -167,17 +167,16 @@ CI (`.github/workflows/ci.yml`) runs on push/PR: install deps, compile Python, r
 
 - **Data engineering:** Raw → cleaned → validated → serving with clear stages, schema validation (Pandera), and documented data-quality issues and fixes.
 - **Data science:** KPI and quality scoring, ridership forecasting (seasonal naive), and anomaly detection (IsolationForest) with outputs consumed by the dashboard.
-- **Visualization:** Single-page dashboard (D3) with Summary (KPI cards + charts + fleet), Forecast (actual vs forecast + anomaly list), and Data Quality (heatmap).
+- **Visualization:** Single-page dashboard (D3) with one Summary view: KPI cards plus 10 interactive charts (histogram, line, time series, scatter, emissions, cost by route, vehicle usage, ridership by route, forecast, data quality). Click a chart to open a larger modal with pan/zoom and drag-to-resize.
 
 ---
 
 ## Screenshots / GIF
 
-1. **Summary:** KPI cards at top; 2×2 charts (histogram, line, time series, scatter); fleet section (emissions over time, cost by route, vehicle type).
-2. **Forecast:** Line chart (actual vs forecast) and bullet list of anomalies.
-3. **Data Quality:** Table heatmap of quality score by route and date (green = high, red = low).
+1. **Summary:** KPI cards at top; 2-column grid of 10 charts (histogram, line, time series, scatter, emissions, cost by route, vehicle type, ridership by route, forecast, data quality). Each chart has a Show checkbox (uncheck to hide; restore from the bar above the grid). Time series legend is clickable to toggle Ridership / On-time %.
+2. **Click any chart** to open a larger modal: drag to pan, scroll to zoom, drag the bottom-right corner to resize the window.
 
-To record a GIF: run `make demo`, open Summary → change Route → open Forecast → open Data Quality.
+To record a GIF: run `make demo`, change Route/Metric, toggle chart visibility, click a chart to open the modal, then pan/zoom/resize.
 
 ---
 
