@@ -214,6 +214,39 @@ function setup () {
     if (ev.key === "Escape") closeChartModal();
   });
 
+  // Drag-to-resize modal (and thus the chart) from bottom-right handle
+  (function() {
+    const content = document.getElementById("chart-modal-content");
+    const handle = content?.querySelector(".chart-modal-resize-handle");
+    if (!content || !handle) return;
+    let startX, startY, startW, startH;
+    function onMove(ev) {
+      const dx = ev.clientX - startX;
+      const dy = ev.clientY - startY;
+      let w = Math.max(320, Math.min(window.innerWidth - 40, startW + dx));
+      let h = Math.max(300, Math.min(window.innerHeight - 40, startH + dy));
+      content.style.width = w + "px";
+      content.style.height = h + "px";
+    }
+    function onUp() {
+      document.removeEventListener("mousemove", onMove);
+      document.removeEventListener("mouseup", onUp);
+      document.body.style.cursor = "";
+      document.body.style.userSelect = "";
+    }
+    handle.addEventListener("mousedown", function(ev) {
+      ev.preventDefault();
+      startX = ev.clientX;
+      startY = ev.clientY;
+      startW = content.offsetWidth;
+      startH = content.offsetHeight;
+      document.body.style.cursor = "nwse-resize";
+      document.body.style.userSelect = "none";
+      document.addEventListener("mousemove", onMove);
+      document.addEventListener("mouseup", onUp);
+    });
+  })();
+
   // Prefer pipeline serving data if present
   d3.csv("data/serving/route_a.csv").then(() => { DATA_BASE = "data/serving"; }).catch(() => {}).finally(() => {
     loadServingJson();

@@ -589,12 +589,41 @@ path.layer {
   background: var(--card);
   border-radius: var(--radius);
   box-shadow: var(--shadow), 0 0 0 1px var(--border);
-  min-width: min(920px, 92vw);
-  max-width: 96vw;
-  max-height: 92vh;
+  width: 80vw;
+  height: 75vh;
+  min-width: 480px;
+  min-height: 360px;
+  max-width: 95vw;
+  max-height: 90vh;
   display: flex;
   flex-direction: column;
   overflow: hidden;
+}
+.chart-modal-resize-handle {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  width: 28px;
+  height: 28px;
+  cursor: nwse-resize;
+  z-index: 3;
+  background: var(--panel);
+  border-top: 1px solid var(--border);
+  border-left: 1px solid var(--border);
+  border-radius: 0 0 4px 0;
+}
+.chart-modal-resize-handle::after {
+  content: "";
+  position: absolute;
+  right: 8px;
+  bottom: 8px;
+  width: 10px;
+  height: 10px;
+  border-right: 2px solid var(--muted);
+  border-bottom: 2px solid var(--muted);
+}
+.chart-modal-resize-handle:hover {
+  background: var(--border);
 }
 .chart-modal-close {
   position: absolute;
@@ -642,11 +671,11 @@ path.layer {
   max-width: none;
 }
 .chart-modal-body .chart-svg {
-  width: min(880px, 88vw) !important;
-  min-width: 480px;
+  width: 100% !important;
+  max-width: 100%;
+  min-width: 400px;
   height: auto !important;
   display: block;
-  max-width: 100%;
 }
 .chart-modal-body .quality-heatmap-wrap {
   overflow: auto;
