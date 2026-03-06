@@ -191,9 +191,31 @@ body{
 }
 .charts-grid-10 .chart-card { min-height: 380px; display: flex; flex-direction: column; overflow: hidden; }
 .charts-grid-10 .chart-card-hidden { display: none; }
-.charts-grid-10 .chart-head { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
-.charts-grid-10 .chart-head h3 { margin: 0; font-size: 15px; }
-.charts-grid-10 .chart-head .caption { margin: 0; font-size: 12px; flex-basis: 100%; }
+.charts-grid-10 .chart-head {
+  display: flex;
+  align-items: center;
+  gap: 6px 10px;
+  flex-wrap: nowrap;
+  padding: 2px 0 4px;
+  min-height: 0;
+}
+.charts-grid-10 .chart-head .chart-toggle { flex-shrink: 0; white-space: nowrap; }
+.charts-grid-10 .chart-head h3 { margin: 0; font-size: 13px; font-weight: 600; flex-shrink: 0; }
+.charts-grid-10 .chart-head h3::after { content: " — "; font-weight: 400; color: var(--muted); }
+.charts-grid-10 .chart-head .caption {
+  margin: 0;
+  font-size: 11px;
+  color: var(--muted);
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+@media (max-width: 600px) {
+  .charts-grid-10 .chart-head { flex-wrap: wrap; }
+  .charts-grid-10 .chart-head .caption { white-space: normal; }
+}
 .charts-grid-10 .chart-plot { flex: 1; min-height: 340px; display: flex; align-items: center; justify-content: center; overflow: hidden; }
 .charts-grid-10 .chart-plot .chart-svg { width: 100%; height: 100%; max-height: 100%; object-fit: contain; aspect-ratio: 520 / 260; }
 .charts-grid-10 .chart-plot .quality-heatmap-wrap { width: 100%; max-width: 100%; }
@@ -278,8 +300,8 @@ body{
 .kpi-cards {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 1rem;
-  padding: 1.25rem 0 1.5rem;
+  gap: 0.6rem;
+  padding: 0.75rem 0 1rem;
   max-width: 100%;
 }
 @media (max-width: 700px) {
@@ -289,19 +311,19 @@ body{
   .kpi-cards { grid-template-columns: 1fr; }
 }
 .kpi-card {
-  padding: 1rem 1.15rem;
+  padding: 0.5rem 0.75rem;
   background: #fff;
   border: 1px solid var(--border);
-  border-radius: 12px;
-  font-size: 0.8125rem;
+  border-radius: 8px;
+  font-size: 0.75rem;
   color: var(--muted);
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
   border-left: 3px solid var(--accent);
 }
 .kpi-card .kpi-val {
   display: block;
-  margin-top: 0.25rem;
-  font-size: 1.375rem;
+  margin-top: 0.15rem;
+  font-size: 1rem;
   font-weight: 700;
   color: var(--fg);
   letter-spacing: -0.01em;
