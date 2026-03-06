@@ -1,4 +1,4 @@
-# Transit Ops IQ
+# Transit Ops Lab
 
 **Recruiter-grade portfolio project:** end-to-end data pipeline (dirty data → cleaning → validation → metrics → forecasting & anomaly detection) plus an interactive D3 + Leaflet dashboard that consumes the processed outputs.
 
@@ -185,6 +185,14 @@ CI (`.github/workflows/ci.yml`) runs on push/PR: install deps, compile Python, r
 To record a GIF: run `make demo`, change Route/Metric, toggle chart visibility, click a chart to open the modal, then pan/zoom/resize.
 
 ---
+
+## Publishing
+
+The dashboard is **static** (HTML, CSS, JS). To publish:
+
+1. **Host the repo root** so that `index.html`, `docs.html`, `script.js`, `style.css`, `docs.css`, and the `data/` folder are served (e.g. GitHub Pages, Netlify, or any static host).
+2. **Prebuilt data**: `data/serving/` and `data/*.csv` are included so the app works without running the pipeline. For GitHub Pages, enable the repo and use the default branch; the site will serve from the root.
+3. **Optional**: Update the "Personal Webpage" link in `index.html` and `docs.html` if your URL changes.
 
 ## Author
 
