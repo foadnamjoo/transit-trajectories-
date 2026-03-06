@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>User Guide — Transit Ops Lab</title>
+  <meta name="description" content="How to use the Transit Ops Lab dashboard: filters, charts, and chart modal." />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="docs.css" />
+</head>
+<body class="docs-page">
+  <header class="docs-header">
+    <div class="docs-container">
+      <div class="docs-header-inner">
+        <h1>Transit Ops Lab</h1>
+        <p class="docs-subtitle">User Guide & Documentation</p>
+        <nav class="docs-nav">
+          <a href="index.html">← Back to Dashboard</a>
+          <a href="https://users.cs.utah.edu/~foad27/" rel="noopener">Author</a>
+        </nav>
+      </div>
+    </div>
+  </header>
+
+  <main class="docs-main">
+    <div class="docs-container docs-layout">
+      <aside class="docs-toc" aria-label="Table of contents">
+        <h2>Contents</h2>
+        <ol>
+          <li><a href="#overview">Overview</a></li>
+          <li><a href="#toolbar">Toolbar</a></li>
+          <li><a href="#kpi-cards">KPI Cards</a></li>
+          <li><a href="#chart-grid">Chart Grid</a></li>
+          <li><a href="#time-series">Time Series Chart</a></li>
+          <li><a href="#chart-modal">Chart Modal (Zoom View)</a></li>
+          <li><a href="#keyboard">Keyboard & Accessibility</a></li>
+        </ol>
+      </aside>
+
+      <div class="docs-content">
+        <section id="overview" class="docs-section">
+          <h2>Overview</h2>
+          <p>Transit Ops Lab is an interactive dashboard for monitoring <strong>reliability, cost, and emissions</strong> across city bus routes. The dashboard shows key performance indicators (KPIs) and a set of charts that update when you change the selected route or metric. All charts appear on a single Summary view; you can show or hide individual charts and open any chart in a larger, resizable modal.</p>
+        </section>
+
+        <section id="toolbar" class="docs-section">
+          <h2>Toolbar</h2>
+          <p>At the top of the dashboard, two dropdowns control what data is shown:</p>
+          <dl class="docs-dl">
+            <dt><strong>Route</strong></dt>
+            <dd>Select one of the six routes (Route A through F). All charts that depend on a single route (e.g., histogram, line chart, emissions, forecast) update to show data for that route.</dd>
+            <dt><strong>Metric</strong></dt>
+            <dd>Choose <strong>Ridership</strong> or <strong>On-time %</strong>. This affects the histogram, line chart, and any chart that displays “the selected metric.”</dd>
+          </dl>
+        </section>
+
+        <section id="kpi-cards" class="docs-section">
+          <h2>KPI Cards</h2>
+          <p>Below the toolbar, four cards show aggregate values when pipeline data is available:</p>
+          <ul>
+            <li><strong>Total ridership</strong> — Sum of ridership across all routes.</li>
+            <li><strong>Total cost</strong> — Total cost in USD.</li>
+            <li><strong>Total CO₂ (kg)</strong> — Total tailpipe CO₂.</li>
+            <li><strong>Routes</strong> — Number of routes in the dataset.</li>
+          </ul>
+          <p>If you have not run the pipeline, these cards may be empty; the rest of the dashboard still works with the built-in route CSVs.</p>
+        </section>
+
+        <section id="chart-grid" class="docs-section">
+          <h2>Chart Grid</h2>
+          <p>The main area is a <strong>two-column grid</strong> of up to 10 charts:</p>
+          <ul>
+            <li>Histogram, Line Chart, Time Series, Scatterplot</li>
+            <li>Emissions over time, Total cost by route, Vehicle type usage</li>
+            <li>Ridership by route, Forecast, Data Quality</li>
+          </ul>
+          <h3>Showing and hiding charts</h3>
+          <p>Each chart card has a <strong>Show</strong> checkbox in the header. Uncheck it to hide that chart; the card disappears from the grid so the layout reflows. Hidden charts are listed as buttons in the <strong>restore bar</strong> above the grid (e.g., “Show Histogram”). Click a button to bring that chart back and check its Show box again.</p>
+        </section>
+
+        <section id="time-series" class="docs-section">
+          <h2>Time Series Chart</h2>
+          <p>The <strong>Time series</strong> chart plots both <strong>Ridership</strong> and <strong>On-time %</strong> over time (with two y-axes). The legend shows “Variables” with two items: <strong>Ridership</strong> and <strong>On-time %</strong>. <strong>Click a legend item</strong> to toggle that series on or off. At least one variable remains visible. This helps you focus on one series or compare both.</p>
+        </section>
+
+        <section id="chart-modal" class="docs-section">
+          <h2>Chart Modal (Zoom View)</h2>
+          <p>Click anywhere on a chart’s plot area (not the “Show” checkbox) to open it in a <strong>larger modal window</strong>.</p>
+          <h3>What you can do in the modal</h3>
+          <ul>
+            <li><strong>Pan</strong> — Drag the chart to move it.</li>
+            <li><strong>Zoom</strong> — Use the mouse wheel (or pinch on touch devices) to zoom in and out (about 0.4× to 8×).</li>
+            <li><strong>Resize the window</strong> — Drag the <strong>bottom-right corner</strong> of the modal (the resize handle) to make the window larger or smaller.</li>
+          </ul>
+          <p>Close the modal by clicking the <strong>×</strong> button, clicking the dark backdrop outside the chart, or pressing <kbd>Escape</kbd>. The Data Quality chart opens in the same modal but does not support pan/zoom (it is a table).</p>
+        </section>
+
+        <section id="keyboard" class="docs-section">
+          <h2>Keyboard & Accessibility</h2>
+          <ul>
+            <li><kbd>Escape</kbd> — Closes the chart modal when it is open.</li>
+            <li>When the modal opens, focus moves to the close button so you can press <kbd>Enter</kbd> or <kbd>Space</kbd> to close it.</li>
+            <li>Dropdowns and buttons are keyboard accessible; use <kbd>Tab</kbd> to move between controls.</li>
+          </ul>
+        </section>
+
+        <p class="docs-back"><a href="index.html">← Back to Dashboard</a></p>
+      </div>
+    </div>
+  </main>
+
+  <footer class="docs-footer">
+    <div class="docs-container">
+      <p>Transit Ops Lab · User Guide · <a href="index.html">Dashboard</a></p>
+    </div>
+  </footer>
+</body>
+</html>

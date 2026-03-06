@@ -90,6 +90,10 @@ python python/run_pipeline.py
 
 Outputs go to `data/serving/`. Serve the repo root with any static server to view the dashboard.
 
+### User documentation
+
+From the dashboard, click **Documentation → User Guide** in the header, or open **docs.html** directly. The user guide explains the toolbar, KPI cards, chart grid, show/hide and restore, the time series legend, and the chart modal (pan, zoom, resize).
+
 ### Demo mode (prebuilt data, e.g. GitHub Pages)
 
 Prebuilt files in `data/serving/` (route CSVs, route_shapes.csv, kpis.json, quality.json, forecast.json, anomalies.json) are committed so the dashboard works without running the pipeline. To regenerate them:
@@ -134,6 +138,8 @@ CI (`.github/workflows/ci.yml`) runs on push/PR: install deps, compile Python, r
 
 ```
 ├── index.html              # Dashboard entry
+├── docs.html               # User guide & documentation
+├── docs.css                # Documentation page styles
 ├── script.js               # D3 charts, KPI cards, forecast/quality, chart modal (pan/zoom/resize)
 ├── style.css               # Styles
 ├── Makefile                # demo | pipeline | serve | test | lint

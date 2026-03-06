@@ -1,0 +1,218 @@
+/* ===== User documentation layout ===== */
+
+.docs-page {
+  min-height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.docs-header {
+  background: linear-gradient(180deg, #f7fbff 0%, #fff 100%);
+  border-bottom: 1px solid var(--border);
+  padding: 1.25rem 0;
+}
+
+.docs-header-inner {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 1rem 1.5rem;
+}
+
+.docs-header h1 {
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: 700;
+}
+
+.docs-subtitle {
+  margin: 0;
+  color: var(--muted);
+  font-size: 1rem;
+}
+
+.docs-nav {
+  margin-left: auto;
+  display: flex;
+  gap: 1rem;
+}
+
+.docs-nav a {
+  color: var(--accent-ink);
+  text-decoration: none;
+  font-weight: 500;
+  padding: 0.35rem 0.6rem;
+  border-radius: 8px;
+}
+
+.docs-nav a:hover {
+  background: rgba(79, 175, 211, 0.12);
+}
+
+.docs-container {
+  width: min(960px, 92%);
+  margin: 0 auto;
+  padding: 0 0.5rem;
+}
+
+.docs-main {
+  flex: 1;
+  padding: 2rem 0 3rem;
+}
+
+.docs-layout {
+  display: grid;
+  grid-template-columns: 200px 1fr;
+  gap: 3rem;
+  align-items: start;
+}
+
+@media (max-width: 768px) {
+  .docs-layout {
+    grid-template-columns: 1fr;
+  }
+  .docs-toc {
+    position: static;
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 1rem;
+  }
+}
+
+.docs-toc {
+  position: sticky;
+  top: 1rem;
+}
+
+.docs-toc h2 {
+  margin: 0 0 0.75rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.docs-toc ol {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.docs-toc li {
+  margin: 0.25rem 0;
+}
+
+.docs-toc a {
+  color: var(--fg);
+  text-decoration: none;
+  font-size: 0.9375rem;
+}
+
+.docs-toc a:hover {
+  color: var(--accent-ink);
+  text-decoration: underline;
+}
+
+.docs-content {
+  min-width: 0;
+}
+
+.docs-section {
+  margin-bottom: 2.5rem;
+}
+
+.docs-section h2 {
+  margin: 0 0 1rem;
+  padding-bottom: 0.5rem;
+  font-size: 1.375rem;
+  font-weight: 600;
+  border-bottom: 1px solid var(--border);
+  color: var(--fg);
+}
+
+.docs-section h3 {
+  margin: 1.25rem 0 0.5rem;
+  font-size: 1.0625rem;
+  font-weight: 600;
+  color: var(--fg);
+}
+
+.docs-section p,
+.docs-section ul,
+.docs-section dl {
+  margin: 0 0 1rem;
+  line-height: 1.6;
+  color: var(--fg);
+}
+
+.docs-section ul {
+  padding-left: 1.5rem;
+}
+
+.docs-dl {
+  margin: 0.5rem 0 1rem;
+}
+
+.docs-dl dt {
+  margin-top: 0.75rem;
+  font-weight: 600;
+  color: var(--fg);
+}
+
+.docs-dl dt:first-child {
+  margin-top: 0;
+}
+
+.docs-dl dd {
+  margin: 0.25rem 0 0 0;
+  padding-left: 0;
+  color: var(--muted);
+}
+
+kbd {
+  display: inline-block;
+  padding: 0.15rem 0.45rem;
+  font-family: ui-monospace, monospace;
+  font-size: 0.8125rem;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  box-shadow: 0 1px 0 var(--border);
+}
+
+.docs-back {
+  margin-top: 2rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--border);
+}
+
+.docs-back a {
+  color: var(--accent-ink);
+  font-weight: 500;
+  text-decoration: none;
+}
+
+.docs-back a:hover {
+  text-decoration: underline;
+}
+
+.docs-footer {
+  padding: 1rem 0;
+  border-top: 1px solid var(--border);
+  background: var(--panel);
+  font-size: 0.875rem;
+  color: var(--muted);
+}
+
+.docs-footer p {
+  margin: 0;
+}
+
+.docs-footer a {
+  color: var(--accent-ink);
+  text-decoration: none;
+}
+
+.docs-footer a:hover {
+  text-decoration: underline;
+}
